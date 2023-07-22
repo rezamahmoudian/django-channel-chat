@@ -1,0 +1,15 @@
+WSGI (web server gate interface)  beyn webserver va webaplication garar migirad va yek seri ghavanin tarif mikonad k webserver va webaplication taht
+an ghavanin ba ham ertebat bargharar mikonnand
+
+ASGI (Asynchronous Server Gateway Interface)
+
+CONSUMER
+dar django vaghti yek http request accept mishavad ba url conf view marbote ra call mikonad
+vaghti veb soket connection ghabol mishavad dar root routing connection check mishavad va agar vojod dasht consumer morede nazar k baraye handle kardan events
+root routing = urls       consumer = view
+
+
+channel ha az asynchronous suport mikonad va asynchronoumers ha amalkard behtari az project midahand
+vali dar bazi az halatha baes blcok shodan bazi amaliyat ha mishavand mesl dastresi b modelhaye django
+
+

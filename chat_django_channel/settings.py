@@ -70,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'chat_django_channel.wsgi.application'
+# WSGI_APPLICATION = 'chat_django_channel.wsgi.application'
 
 
 # Database
