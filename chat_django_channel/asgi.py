@@ -12,6 +12,7 @@ import chat.routing
 
 # dadan proje be dast asgi
 # tarif protocol baraye shabake va vazife masiryabi beyn anhara b ProtocolTypeRouter
+# masir yabi bar asas noe protocol
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
