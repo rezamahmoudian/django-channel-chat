@@ -25,20 +25,21 @@ SECRET_KEY = 'django-insecure-ko_iar=xafmee27^pjv#ke$b&rt-#gjr309^93m-a5d_(aqft9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
-    'chat',
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,17 @@ TEMPLATES = [
 ]
 
 # WSGI_APPLICATION = 'chat_django_channel.wsgi.application'
+ASGI_APPLICATION = "chat_django_channel.asgi.application"
 
+# channel layers ba config haye neveshte shode b project ezafe shavand
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -125,13 +136,3 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ASGI_APPLICATION = "chat_django_channel.asgi.application"
-# channel layers ba config haye neveshte shode b project ezafe shavand
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
