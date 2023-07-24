@@ -12,4 +12,5 @@ root routing = urls       consumer = view
 channel ha az asynchronous suport mikonad va asynchronoumers ha amalkard behtari az project midahand
 vali dar bazi az halatha baes blcok shodan bazi amaliyat ha mishavand mesl dastresi b modelhaye django
 
+self.scope shamel data darbareye conection ast va mitavan etelaat mokhtalef ra az an gereft (shabihe self.request django)
 
