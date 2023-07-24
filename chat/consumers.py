@@ -6,6 +6,22 @@ from asgiref.sync import async_to_sync
 
 # sakht yek consumer va ers bari kardan az consumer websoketconsumer
 class ChatConsumer(WebsocketConsumer):
+
+    # vaghti k yek user payam khasi ra b samt server mifrestad in func
+    # ejra mishavad va az message model sazi mikonad va data daryafti ra dar database zakhire mikonad
+    def new_message(self, data):
+        print("its ok")
+
+    def fetch_message(self):
+        pass
+
+    # yek dict k command hayi k mishavad anjam dad ra darad va mitavanim ba estefade az an b function
+    # hay neveshte shode dastresi dashte bashim
+    commands = {
+        "new_message": new_message,
+        "fetch_message": fetch_message
+    }
+
     def connect(self):
         # scope etelaat darbareye connection darad
         # gereftan room_name az self.scope
@@ -37,6 +53,9 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         # joda kardan ghesmat message az text data
         message = text_data_json["message"]
+        command = text_data_json["command"]
+
+        self.commands[command](self, message)
 
         # ersal event b group
         async_to_sync(self.channel_layer.group_send)(
