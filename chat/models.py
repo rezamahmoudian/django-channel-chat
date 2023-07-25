@@ -15,4 +15,4 @@ class Message(models.Model):
         return last_messages
 
     def __str__(self):
-        return self.author
+        return self.author.username

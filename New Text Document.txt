@@ -14,3 +14,10 @@ vali dar bazi az halatha baes blcok shodan bazi amaliyat ha mishavand mesl dastr
 
 self.scope shamel data darbareye conection ast va mitavan etelaat mokhtalef ra az an gereft (shabihe self.request django)
 
+channel layer
+har channel yek nam unique darad channel manand sandogh posti ast k name daryaft mikonad
+
+har user yek consumer darad va har consumer yek channel darad
+
+group = majmoee az channel ha
+ba dashtan group name mitavan baraye hameye channel haye mojod dar group payam ersal kardan

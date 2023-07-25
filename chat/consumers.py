@@ -2,6 +2,8 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
+from .serializers import MessageSerializer
+from .models import Message
 
 
 # sakht yek consumer va ers bari kardan az consumer websoketconsumer
@@ -13,7 +15,13 @@ class ChatConsumer(WebsocketConsumer):
         print("its ok")
 
     def fetch_message(self):
-        pass
+        qs = Message.get_last_messages()
+        self.message_serializer(self, qs)
+
+    def message_serializer(self, qs):
+        serializer = MessageSerializer(qs, many=True)
+        print(serializer)
+        return serializer
 
     # yek dict k command hayi k mishavad anjam dad ra darad va mitavanim ba estefade az an b function
     # hay neveshte shode dastresi dashte bashim
