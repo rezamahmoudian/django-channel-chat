@@ -15,7 +15,7 @@ class ChatConsumer(WebsocketConsumer):
     def new_message(self, data):
         print("its ok")
 
-    def fetch_message(self):
+    def fetch_message(self, data):
         qs = Message.get_last_messages(self)
         message_json = self.message_serializer(qs)
         content = {
@@ -68,8 +68,7 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json.get("message", None)
         command = text_data_json["command"]
 
-        self.commands[command](self)
-
+        self.commands[command](self, message)
 
     def send_message_to_group(self, message):
         # ersal event b group
@@ -87,7 +86,6 @@ class ChatConsumer(WebsocketConsumer):
         print(event)
         # data json shode ra b websoket barmigardanad
         self.send(text_data=json.dumps({"message": message}))
-
 
 
 ####################################################################################################
