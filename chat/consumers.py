@@ -4,6 +4,7 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from .serializers import MessageSerializer
 from .models import Message
+from rest_framework.renderers import JSONRenderer
 
 
 # sakht yek consumer va ers bari kardan az consumer websoketconsumer
@@ -15,13 +16,18 @@ class ChatConsumer(WebsocketConsumer):
         print("its ok")
 
     def fetch_message(self):
-        qs = Message.get_last_messages()
-        self.message_serializer(self, qs)
+        qs = Message.get_last_messages(self)
+        message_json = self.message_serializer(qs)
+        content = {
+            "message": eval(message_json)
+        }
+        self.chat_message(content)
 
     def message_serializer(self, qs):
         serializer = MessageSerializer(qs, many=True)
         print(serializer)
-        return serializer
+        message = JSONRenderer().render(serializer.data)
+        return message
 
     # yek dict k command hayi k mishavad anjam dad ra darad va mitavanim ba estefade az an b function
     # hay neveshte shode dastresi dashte bashim
@@ -55,29 +61,32 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     # daryaft data hayi k dar websoket baraye ma ersal mishavad
-    #
     def receive(self, text_data):
         # sakht yek dict json az datahaye daryafti
         text_data_json = json.loads(text_data)
         # joda kardan ghesmat message az text data
-        message = text_data_json["message"]
+        message = text_data_json.get("message", None)
         command = text_data_json["command"]
 
-        self.commands[command](self, message)
+        self.commands[command](self)
 
+
+    def send_message_to_group(self, message):
         # ersal event b group
         async_to_sync(self.channel_layer.group_send)(
             # dar jeloye type esm function neveshte mishavad k event az an daryaft mishavad
-            self.room_group_name, {"type": "chat_message", "message": message}
+            self.room_group_name,
+            {
+                "type": "chat_message",
+                "message": message
+             }
         )
 
     def chat_message(self, event):
         message = event["message"]
-
+        print(event)
         # data json shode ra b websoket barmigardanad
         self.send(text_data=json.dumps({"message": message}))
-
-
 
 
 
