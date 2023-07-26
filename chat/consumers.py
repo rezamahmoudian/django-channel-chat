@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync
 from .serializers import MessageSerializer
 from .models import Message
 from rest_framework.renderers import JSONRenderer
+from django.contrib.auth import get_user_model
 
 
 # sakht yek consumer va ers bari kardan az consumer websoketconsumer
@@ -13,7 +14,15 @@ class ChatConsumer(WebsocketConsumer):
     # vaghti k yek user payam khasi ra b samt server mifrestad in func
     # ejra mishavad va az message model sazi mikonad va data daryafti ra dar database zakhire mikonad
     def new_message(self, data):
-        print("its ok")
+        author_username = data['username']
+        content = data["message"]
+        author = get_user_model().objects.get(username=author_username)
+        message_model = Message.objects.create(author=author, content=content)
+        print("message model")
+        message = self.message_serializer(message_model)
+        message_content = eval(message)['content']
+        print(message_content)
+        self.send_message_to_group(message_content)
 
     def fetch_message(self, data):
         qs = Message.get_last_messages(self)
@@ -24,8 +33,8 @@ class ChatConsumer(WebsocketConsumer):
         self.chat_message(content)
 
     def message_serializer(self, qs):
-        serializer = MessageSerializer(qs, many=True)
-        print(serializer)
+        get_many = (lambda get_many: True if (qs.__class__.__name__ == 'QuerySet') else False)(qs)
+        serializer = MessageSerializer(qs, many=get_many)
         message = JSONRenderer().render(serializer.data)
         return message
 
@@ -33,7 +42,7 @@ class ChatConsumer(WebsocketConsumer):
     # hay neveshte shode dastresi dashte bashim
     commands = {
         "new_message": new_message,
-        "fetch_message": fetch_message
+        "fetch_message": fetch_message,
     }
 
     def connect(self):
@@ -68,7 +77,7 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json.get("message", None)
         command = text_data_json["command"]
 
-        self.commands[command](self, message)
+        self.commands[command](self, text_data_json)
 
     def send_message_to_group(self, message):
         # ersal event b group
@@ -83,7 +92,6 @@ class ChatConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         message = event["message"]
-        print(event)
         # data json shode ra b websoket barmigardanad
         self.send(text_data=json.dumps({"message": message}))
 
