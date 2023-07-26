@@ -20,15 +20,16 @@ class ChatConsumer(WebsocketConsumer):
         message_model = Message.objects.create(author=author, content=content)
         print("message model")
         message = self.message_serializer(message_model)
-        message_content = eval(message)['content']
-        print(message_content)
-        self.send_message_to_group(message_content)
+        message = eval(message)
+        self.send_message_to_group(message)
 
+    # ba harbar refresh shodan safhe message haye mojod refresh mishavand
     def fetch_message(self, data):
         qs = Message.get_last_messages(self)
         message_json = self.message_serializer(qs)
         content = {
-            "message": eval(message_json)
+            "message": eval(message_json),
+            "command": "fetch_message"
         }
         self.chat_message(content)
 
@@ -80,13 +81,16 @@ class ChatConsumer(WebsocketConsumer):
         self.commands[command](self, text_data_json)
 
     def send_message_to_group(self, message):
+        print(message)
         # ersal event b group
         async_to_sync(self.channel_layer.group_send)(
             # dar jeloye type esm function neveshte mishavad k event az an daryaft mishavad
             self.room_group_name,
             {
                 "type": "chat_message",
-                "message": message
+                "content": message['content'],
+                "command": 'new_message',
+                "__str__": message['__str__']
              }
         )
 
@@ -96,7 +100,7 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({"message": message}))
 
 
-####################################################################################################
+################################## BASE ##################################################################
 # import json
 #
 # from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer

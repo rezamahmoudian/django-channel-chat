@@ -39,7 +39,7 @@
     />
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <link rel="stylesheet" href="{% static 'chat/style.css' %}" />
   </head>
   <body>
     <div id="frame">
@@ -92,7 +92,7 @@
 
 
     {{ room_name|json_script:"room-name" }}
-    <script src="{% static 'reconnecting-websocket.js' %}"></script>
+    <script src="{% static 'chat/reconnecting-websocket.js' %}"></script>
     <script>
 
       var username = {{ username }}
@@ -127,17 +127,17 @@
             if(data['__str__'] != username ){
               if(data['roomname'] != roomName){
 
-               
+
                 if (!("Notification" in window)) {
               alert("This browser does not support desktop notification");
             }
-          
+
             // Let's check whether notification permissions have already been granted
             else if (Notification.permission === "granted") {
               // If it's okay let's create a notification
               var notification = new Notification(data['__str__']+" : "+data['content']);
             }
-          
+
             // Otherwise, we need to ask the user for permission
             else if (Notification.permission !== "denied") {
               Notification.requestPermission().then(function (permission) {
@@ -278,19 +278,6 @@
       }
       
       document.getElementById("inp").addEventListener("change", readFile);
-      
-  
-
-
-
-
-
-
-
-
-
-
-
 
     </script>
   </body>
