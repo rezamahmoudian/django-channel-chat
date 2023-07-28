@@ -27,12 +27,14 @@ class ChatConsumer(WebsocketConsumer):
 
     # ba harbar refresh shodan safhe message haye mojod refresh mishavand
     def fetch_message(self, data):
-        room_name = data['roomname']
-        qs = Message.get_last_messages(self, room_name)
-        data_json = self.message_serializer(qs)
+        roomname = data['roomname']
+        qs = Message.get_last_messages(self, roomname)
+        message_json = self.message_serializer(qs)
         content = {
-            "data": eval(data_json),
-            "command": "fetch_message"
+
+            "message": eval(message_json),
+            'command': "fetch_message"
+
         }
         self.chat_message(content)
 
@@ -88,8 +90,6 @@ class ChatConsumer(WebsocketConsumer):
         self.commands[command](self, text_data_json)
 
     def send_message_to_group(self, data):
-        print("data")
-        print(data)
         # command ro bgir agar mojod nabod on ro new_message bzar
         command = data.get('command', 'new_message')
         # ersal event b group
@@ -105,10 +105,10 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def chat_message(self, event):
-        print("event")
-        print(event)
-        # message = event["message"]['content']
+        # message = event["message"]
         # data json shode ra b websoket barmigardanad
+        print("event")
+        print(json.dumps(event))
         self.send(text_data=json.dumps(event))
 
 
