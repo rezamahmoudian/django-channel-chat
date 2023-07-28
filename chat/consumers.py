@@ -21,7 +21,6 @@ class ChatConsumer(WebsocketConsumer):
         related_chat = Chat.objects.get(room_name=room_name)
         author = get_user_model().objects.get(username=author_username)
         message_model = Message.objects.create(author=author, content=content, related_chat=related_chat)
-        print("message model")
         message = self.message_serializer(message_model)
         message = eval(message)
         self.send_message_to_group(message)
@@ -35,9 +34,10 @@ class ChatConsumer(WebsocketConsumer):
             "data": eval(data_json),
             "command": "fetch_message"
         }
-        print("content")
-        print(content)
         self.chat_message(content)
+
+    def image(self, data):
+        self.send_message_to_group(data)
 
     def message_serializer(self, qs):
         get_many = (lambda get_many: True if (qs.__class__.__name__ == 'QuerySet') else False)(qs)
@@ -50,6 +50,7 @@ class ChatConsumer(WebsocketConsumer):
     commands = {
         "new_message": new_message,
         "fetch_message": fetch_message,
+        "img": image,
     }
 
     def connect(self):
@@ -86,17 +87,20 @@ class ChatConsumer(WebsocketConsumer):
 
         self.commands[command](self, text_data_json)
 
-    def send_message_to_group(self, message):
-        print(message)
+    def send_message_to_group(self, data):
+        print("data")
+        print(data)
+        # command ro bgir agar mojod nabod on ro new_message bzar
+        command = data.get('command', 'new_message')
         # ersal event b group
         async_to_sync(self.channel_layer.group_send)(
             # dar jeloye type esm function neveshte mishavad k event az an daryaft mishavad
             self.room_group_name,
             {
                 "type": "chat_message",
-                "content": message['content'],
-                "command": 'new_message',
-                "__str__": message['__str__']
+                "content": data['content'],
+                "command": command,
+                "__str__": data['__str__']
              }
         )
 
