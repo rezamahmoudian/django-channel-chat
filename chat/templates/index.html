@@ -8,6 +8,12 @@
 <body>
 
 
+{% for chatroom in chat_rooms %}
+    <a href="http://localhost:8000/chat/{{ chatroom.room_name }}">{{ chatroom.room_name }}</a>
+    <br>
+
+{% endfor %}
+
 
 
 

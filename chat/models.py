@@ -6,11 +6,11 @@ user = get_user_model()
 
 
 class Chat(models.Model):
-    roomname = models.CharField(max_length=100)
+    room_name = models.CharField(max_length=100)
     members = models.ManyToManyField(user, null=True, blank=True)
 
     def __str__(self):
-        return self.roomname
+        return self.room_name
 
 
 class Message(models.Model):
@@ -20,7 +20,7 @@ class Message(models.Model):
     send_time = models.DateTimeField(auto_now_add=True)
 
     def get_last_messages(self, roomname):
-        last_messages = Message.objects.filter(related_chat__roomname=roomname).order_by('-send_time')
+        last_messages = Message.objects.filter(related_chat__room_name=roomname).order_by('-send_time')
         return last_messages
 
     def __str__(self):

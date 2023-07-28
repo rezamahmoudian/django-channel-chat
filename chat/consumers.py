@@ -6,6 +6,7 @@ from .serializers import MessageSerializer
 from .models import Message
 from rest_framework.renderers import JSONRenderer
 from django.contrib.auth import get_user_model
+from .models import Chat
 
 
 # sakht yek consumer va ers bari kardan az consumer websoketconsumer
@@ -16,8 +17,10 @@ class ChatConsumer(WebsocketConsumer):
     def new_message(self, data):
         author_username = data['username']
         content = data["message"]
+        room_name = data['roomname']
+        related_chat = Chat.objects.get(room_name=room_name)
         author = get_user_model().objects.get(username=author_username)
-        message_model = Message.objects.create(author=author, content=content)
+        message_model = Message.objects.create(author=author, content=content, related_chat=related_chat)
         print("message model")
         message = self.message_serializer(message_model)
         message = eval(message)
@@ -25,13 +28,15 @@ class ChatConsumer(WebsocketConsumer):
 
     # ba harbar refresh shodan safhe message haye mojod refresh mishavand
     def fetch_message(self, data):
-        roomname = data['roomname']
-        qs = Message.get_last_messages(self, roomname)
-        message_json = self.message_serializer(qs)
+        room_name = data['roomname']
+        qs = Message.get_last_messages(self, room_name)
+        data_json = self.message_serializer(qs)
         content = {
-            "message": eval(message_json),
+            "data": eval(data_json),
             "command": "fetch_message"
         }
+        print("content")
+        print(content)
         self.chat_message(content)
 
     def message_serializer(self, qs):
@@ -96,9 +101,11 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def chat_message(self, event):
-        message = event["message"]
+        print("event")
+        print(event)
+        # message = event["message"]['content']
         # data json shode ra b websoket barmigardanad
-        self.send(text_data=json.dumps({"message": message}))
+        self.send(text_data=json.dumps(event))
 
 
 
