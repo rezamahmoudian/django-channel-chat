@@ -25,7 +25,8 @@ class ChatConsumer(WebsocketConsumer):
 
     # ba harbar refresh shodan safhe message haye mojod refresh mishavand
     def fetch_message(self, data):
-        qs = Message.get_last_messages(self)
+        roomname = data['roomname']
+        qs = Message.get_last_messages(self, roomname)
         message_json = self.message_serializer(qs)
         content = {
             "message": eval(message_json),
@@ -98,6 +99,20 @@ class ChatConsumer(WebsocketConsumer):
         message = event["message"]
         # data json shode ra b websoket barmigardanad
         self.send(text_data=json.dumps({"message": message}))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ################################## BASE ##################################################################
