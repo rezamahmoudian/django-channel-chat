@@ -14,11 +14,11 @@ class ChatConsumer(WebsocketConsumer):
 
     # vaghti k yek user payam khasi ra b samt server mifrestad in func
     # ejra mishavad va az message model sazi mikonad va data daryafti ra dar database zakhire mikonad
+    # va sepas payam ra baraye azaye goroh miferestad
     def new_message(self, data):
         author_username = data['username']
         content = data["message"]
         room_name = data['roomname']
-        print(data)
         self.notif(data)
         related_chat = Chat.objects.get(room_name=room_name)
         author = get_user_model().objects.get(username=author_username)
@@ -27,7 +27,8 @@ class ChatConsumer(WebsocketConsumer):
         message = eval(message)
         self.send_message_to_group(message)
 
-    # ba harbar refresh shodan safhe message haye mojod refresh mishavand
+    # ba harbar refresh shodan safhe in tabe farakhani shode va hameye paygham haye mojod
+    # dar an chat room ra baraye namayesh b samte front miferestad
     def fetch_message(self, data):
         roomname = data['roomname']
         qs = Message.get_last_messages(self, roomname)
@@ -40,17 +41,17 @@ class ChatConsumer(WebsocketConsumer):
         }
         self.chat_message(content)
 
+    # ersal tasvir
     def image(self, data):
         self.send_message_to_group(data)
 
+    # ersal notif baraye azaye chat room dar sorat ersal payam dar an chat room
     def notif(self, data):
         chat = Chat.objects.get(room_name=data['roomname'])
         member_list = chat.members.all()
-        print(member_list)
         member_username_list = []
         for i in member_list:
             member_username_list.append(i.username)
-        print(member_username_list)
 
         async_to_sync(self.channel_layer.group_send)(
             # maghsad datahaye ma____jayi k mikaym bfrestimeshon
@@ -71,14 +72,7 @@ class ChatConsumer(WebsocketConsumer):
         message = JSONRenderer().render(serializer.data)
         return message
 
-    # yek dict k command hayi k mishavad anjam dad ra darad va mitavanim ba estefade az an b function
-    # hay neveshte shode dastresi dashte bashim
-    commands = {
-        "new_message": new_message,
-        "fetch_message": fetch_message,
-        "img": image,
-    }
-
+    # etesal websoket
     def connect(self):
         # scope etelaat darbareye connection darad
         # gereftan room_name az self.scope
@@ -96,6 +90,7 @@ class ChatConsumer(WebsocketConsumer):
         # ghabol cardan websoketconnection
         self.accept()
 
+    # disconnect shodan websoket
     def disconnect(self, close_code):
         # leave room group
         async_to_sync(self.channel_layer.group_discard)(
@@ -114,7 +109,7 @@ class ChatConsumer(WebsocketConsumer):
         self.commands[command](self, text_data_json)
 
     def send_message_to_group(self, data):
-        # command ro bgir agar mojod nabod on ro new_message bzar
+        # command ro az data bgir agar mojod nabod on ro new_message bzar
         command = data.get('command', 'new_message')
         # ersal event b group
         async_to_sync(self.channel_layer.group_send)(
@@ -133,7 +128,13 @@ class ChatConsumer(WebsocketConsumer):
         # data json shode ra b websoket barmigardanad
         self.send(text_data=json.dumps(event))
 
-
+    # yek dict k command hayi k mishavad anjam dad ra darad va mitavanim ba estefade az an b function
+    # hay neveshte shode dastresi dashte bashim
+    commands = {
+        "new_message": new_message,
+        "fetch_message": fetch_message,
+        "img": image,
+    }
 
 
 
