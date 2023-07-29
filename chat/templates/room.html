@@ -115,17 +115,15 @@
             + '/'
         );
 
+
       chatSocket2.onmessage = function(e) {
         var data = JSON.parse(e.data)
 
-
-
-
-        for( let i=data['members_list'].length-1; i>=0 ; i--){
-
-          if(data['members_list'][i] == username){
+        for( let i=data['member_list'].length-1; i>=0 ; i--){
+          if(data['member_list'][i] == username){
             if(data['__str__'] != username ){
               if(data['roomname'] != roomName){
+
 
 
                 if (!("Notification" in window)) {

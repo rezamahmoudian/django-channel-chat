@@ -18,6 +18,8 @@ class ChatConsumer(WebsocketConsumer):
         author_username = data['username']
         content = data["message"]
         room_name = data['roomname']
+        print(data)
+        self.notif(data)
         related_chat = Chat.objects.get(room_name=room_name)
         author = get_user_model().objects.get(username=author_username)
         message_model = Message.objects.create(author=author, content=content, related_chat=related_chat)
@@ -40,6 +42,28 @@ class ChatConsumer(WebsocketConsumer):
 
     def image(self, data):
         self.send_message_to_group(data)
+
+    def notif(self, data):
+        chat = Chat.objects.get(room_name=data['roomname'])
+        member_list = chat.members.all()
+        print(member_list)
+        member_username_list = []
+        for i in member_list:
+            member_username_list.append(i.username)
+        print(member_username_list)
+
+        async_to_sync(self.channel_layer.group_send)(
+            # maghsad datahaye ma____jayi k mikaym bfrestimeshon
+            'chat_listener',
+            # dar jeloye type esm function neveshte mishavad k event az an daryaft mishavad
+            {
+                "type": "chat_message",
+                "content": data['message'],
+                "member_list": member_username_list,
+                "__str__": data['username'],
+                "roomname": data['roomname']
+            }
+        )
 
     def message_serializer(self, qs):
         get_many = (lambda get_many: True if (qs.__class__.__name__ == 'QuerySet') else False)(qs)
@@ -107,8 +131,6 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         # message = event["message"]
         # data json shode ra b websoket barmigardanad
-        print("event")
-        print(json.dumps(event))
         self.send(text_data=json.dumps(event))
 
 
